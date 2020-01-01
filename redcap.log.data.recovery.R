@@ -2,7 +2,7 @@
 # may not yet be in PRODUCTION mode: uses logfile
 
 # assumes realtively simple database structure, no repeated instruments, 
-# some modifications might be necessary depending on the structure of your data (i.e. you have survey responses, see line 23), 
+# some modifications (line 40) might be necessary depending on the structure of your data (i.e. you have survey responses, see line 25), 
 # but this should get you pretty close
 # bottom line, follow best practices...move to production before entering any data you wish to keep 
 
