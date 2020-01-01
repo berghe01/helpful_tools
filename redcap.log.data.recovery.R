@@ -6,7 +6,6 @@
 # but this should get you pretty close
 # bottom line, follow best practices...move to production before entering any data you wish to keep 
 
-
 library(tidyverse)
 library(tibble)
 library(lubridate)
