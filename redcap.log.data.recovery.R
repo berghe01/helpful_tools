@@ -1,8 +1,9 @@
 # script to salvage test data from a database which has been accidentally overwritten in REDCap and 
 # may not yet be in PRODUCTION mode: uses logfile
-# assumes realtively simple database structure, no repeated instruments 
-# some modifications might be necessary depending on the structure of your data, but this should get you pretty close
-# bottom line, follow best practices...move to production before entering any data you wish to keep
+# assumes realtively simple database structure, no repeated instruments, 
+# some modifications might be necessary depending on the structure of your data (i.e. you have survey responses, see line 23), 
+# but this should get you pretty close
+# bottom line, follow best practices...move to production before entering any data you wish to keep 
 
 library(tidyverse)
 library(tibble)
@@ -20,9 +21,10 @@ colnames(df) <- c("date_time",# time of each change that was saved to db
 
 df <- df %>%
   filter(str_detect(ID,  # grab only changes for record creation OR modification
-                    "Created Record|Updated Record|Updated Response")) %>%  
+                    "Created Record|Updated Record")) %>%  # could add `|Updated Response` if survey data as well
   select(ID, date_time, changes) %>%
-  mutate(ID = str_sub(ID, start = 15)) # remove excess text so that only record ID number remains 
+  mutate(ID = str_sub(ID, start = 15)) # remove excess text so that only record ID number remains
+                                       # potentially change "start" parameter if `|Updated Reponse` included
 
 df <- df %>%
   separate_rows(changes, sep=",\\s*\\n*") %>% # isolate individual changes per log event
