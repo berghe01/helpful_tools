@@ -1,5 +1,8 @@
-# Script to salvage a database which has been accidentally overwritten in REDCap and 
-# is not yet in PRODUCTION mode - bottom line, move to production before entering data
+# script to salvage test data from a database which has been accidentally overwritten in REDCap and 
+# may not yet be in PRODUCTION mode: uses logfile
+# assumes realtively simple database structure, no repeated instruments 
+# some modifications might be necessary depending on the structure of your data, but this should get you pretty close
+# bottom line, follow best practices...move to production before entering any data you wish to keep
 
 library(tidyverse)
 library(tibble)
@@ -17,7 +20,7 @@ colnames(df) <- c("date_time",# time of each change that was saved to db
 
 df <- df %>%
   filter(str_detect(ID,  # grab only changes for record creation OR modification
-                    "Created Record|Updated Record")) %>%  
+                    "Created Record|Updated Record|Updated Response")) %>%  
   select(ID, date_time, changes) %>%
   mutate(ID = str_sub(ID, start = 15)) # remove excess text so that only record ID number remains 
 
@@ -33,7 +36,7 @@ df <- df %>%
          vars1 != "ID") %>% # remove any changes that included just record creation
   # this step assumes you named your "record ID" variable == "ID" - in reality, you may need 
   # to change this to whatever name you originally applied to your "record ID" field
-  mutate(rn = row_number()) %>% # create a sequence
+  mutate(rn = row_number()) %>% # create a sequence column
   pivot_wider(names_from = vars1, values_from = vars2, 
               values_fill = list(vars2 = '')) %>% # make a long database -> wide
   select(-rn) %>% 
@@ -51,7 +54,7 @@ df[] <- lapply(df, gsub, pattern = "checked", replacement = "1", fixed = TRUE)
 df <- df %>%
   mutate(date_time = mdy_hm(date_time)) 
 
-# there may be cases where an entry was made into a variable, 
+# there may be cases where an entry was made into a variable and 
 # subsequently, this was changed and a new entry was made in that variable,
 # we will filter using date_time so that only the most recent variable is selected
 
@@ -97,7 +100,8 @@ df <- df %>%
 df[is.na(df)] <- "" # remove all NA and replace with ""
 
 # write the file to csv - as long as the structure of the database is intact, you can upload 
-# via the data import tool and hopefully you have recovered your data!
+# via the data import tool and hopefully you have recovered your data
+
 write.csv(df, file = "salvaged_df.csv", row.names = FALSE)
 
 
