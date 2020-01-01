@@ -1,5 +1,5 @@
 # Script to salvage a database which has been accidentally overwritten in REDCap and 
-# is not yet in PRODUCTION mode - bottom line, move to production before entering data!
+# is not yet in PRODUCTION mode - bottom line, move to production before entering data
 
 library(tidyverse)
 library(tibble)
