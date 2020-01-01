@@ -20,6 +20,14 @@ colnames(df) <- c("date_time",# time of each change that was saved to db
                   "ID", # record ID
                   "changes") # actual changes that were made to each variable, delimited by ","
 
+# set date /timepoint from which to initiate recovery of data 
+recover_date <- "2019-12-30 13:32:00 UTC"
+
+# convert date_time to POSIXct
+df <- df %>%
+  mutate(date_time = mdy_hm(date_time)) %>%
+  filter(date_time < recover_date)
+
 df <- df %>%
   filter(str_detect(ID,  # grab only changes for record creation OR modification
                     "Created Record|Updated Record")) %>%  # could add `|Updated Response` if survey data as well
@@ -52,10 +60,6 @@ names(df) <- gsub(x = names(df), pattern = "\\)", replacement = "")
 
 # convert "checked" to a 1
 df[] <- lapply(df, gsub, pattern = "checked", replacement = "1", fixed = TRUE)
-
-# convert date_time to POSIXct
-df <- df %>%
-  mutate(date_time = mdy_hm(date_time)) 
 
 # there may be cases where an entry was made into a variable and 
 # subsequently, this was changed and a new entry was made in that variable,
